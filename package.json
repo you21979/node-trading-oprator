@@ -1,0 +1,29 @@
+{
+  "author": "Yuki Akiyama <you2197901 [at] gmail.com>",
+  "name": "trading-operator",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "etwings":"",
+    "btcbox":"",
+    "request-promise" : "0.2.4"
+  },
+  "readmeFilename": "README.md",
+  "description": "",
+  "main": "index.js",
+  "devDependencies": {
+  },
+  "scripts": {
+    "test": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/you21979/node-trading-operator.git"
+  },
+  "keywords": [
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/you21979/node-trading-operator/issues"
+  }
+}
