@@ -19,3 +19,16 @@ cls.prototype.depth = function(pair){
         };
     });
 }
+
+cls.prototype.balance = function(){
+    return this.private.balance().then(function(result){
+        return Object.keys(result).
+            filter(function(v){return v.match(/_balance/)}).
+            reduce(function(r, v){
+                r[v.replace('_balance', '')] = result[v]
+                return r;
+            }, {})
+    })
+}
+
+
