@@ -32,28 +32,54 @@ cls.prototype.balance = function(){
     })
 }
 
-cls.prototype.tradePosition = function(pair){
-    return this.private.tradeList({since:0,type:'open'}).then(function(results){
-        return getTradePosition(
-            results.filter(function(v){return true}) // フィルターかけようがない
-        );
+cls.prototype.tradeBuy = function(pair, price, amount){
+    return this.private.tradeAdd(pair, amount, price, 'buy').then(function(result){
+        return {
+        }
     })
 }
-cls.prototype.tradePositionAll = function(){
-    return this.private.tradeList({since:0,type:'open'}).then(function(results){
+
+cls.prototype.tradeSell = function(pair, price, amount){
+    return this.private.tradeAdd(pair, amount, price, 'sell').then(function(result){
+        return {
+        }
+    })
+}
+
+cls.prototype.tradePosition = function(pair){
+    return this.private.tradeList(pair, {since:0,type:'open'}).then(function(results){
         return getTradePosition(
+            pair,
             results
         );
     })
 }
+cls.prototype.tradePositionAll = function(){
+    return this.supportAssets().then(function(pairs){
+        return Promise.all(pairs.map(function(pair){
+            return this.private.tradeList(pair, {since:0,type:'open'}).then(function(results){
+                return getTradePosition(
+                    pair,
+                    results
+                );
+            })
+        })).then(function(results){
+            return results.reduce(function(r,v){
+                r.buy.concat(v.buy);
+                r.sell.concat(v.sell);
+                return r;
+            }, {buy:[],sell:[]});
+        })
+    })
+}
 
-var getTradePosition = function(results){
+var getTradePosition = function(pair, results){
     return results.map(function(v){
         return {
             type : v.type,
             data : {
                 id : v.id,
-                pair : 'btc_jpy', // ToDo:ペアがないんだけどw
+                pair : pair,
                 price : v.price,
                 amount : v.amount_original - v.amount_outstanding,
                 time : moment(v.datetime, 'YYYY-MM-DD HH:mm:ss').unix(),
@@ -61,7 +87,7 @@ var getTradePosition = function(results){
         }
     }).
     reduce(function(r, v){
-        r[v.action].push(v.data)
+        r[v.type].push(v.data)
         return r;
     },{buy:[],sell:[]});
 }

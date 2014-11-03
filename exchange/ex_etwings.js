@@ -82,7 +82,7 @@ var getTradePosition = function(result, keys){
         }
     }).
     reduce(function(r, v){
-        r[v.action].push(v.data)
+        r[v.type].push(v.data)
         return r;
     },{buy:[],sell:[]});
 }
