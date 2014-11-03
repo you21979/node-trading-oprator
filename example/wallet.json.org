@@ -1,0 +1,12 @@
+{
+ "etwings1" : {
+  "exchange" : "etwings",
+  "apikey" : "",
+  "secretkey" : ""
+ },
+ "btcbox1" : {
+  "exchange" : "btcbox",
+  "apikey" : "",
+  "secretkey" : ""
+ }
+}

@@ -1,17 +1,8 @@
 var TradingOperator = require('..');
-var config = {
-    'etwings1' : {
-        exchange : 'etwings',
-        apikey : '',
-        secret : ''
-    },
-    'btcbox1' : {
-        exchange : 'btcbox',
-        apikey : '',
-        secret : ''
-    }
-}
-TradingOperator.load('..', config).then(function(){
+var fs = require('fs');
+var walletConfig = fs.readFileSync('./wallet.json', 'utf8');
+
+TradingOperator.load('..', walletConfig).then(function(){
     var wallet = TradingOperator.managers['wallet'];
     wallet.lookup('etwings1').supportAssets().then(console.log)
     wallet.lookup('btcbox1').supportAssets().then(console.log)
