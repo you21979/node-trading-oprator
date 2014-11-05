@@ -48,6 +48,7 @@ cls.prototype.tradeBuy = function(pair, price, amount){
 }
 
 cls.prototype.tradeSell = function(pair, price, amount){
+    var w = pair.split('_');
     return this.private.sellCoin(w[1], amount, price, w[0]).then(function(result){
         return {
             id : result.order_id,
