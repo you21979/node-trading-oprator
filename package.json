@@ -6,6 +6,8 @@
   "dependencies": {
     "etwings":"",
     "btcbox":"",
+    "allcoin":"",
+    "ripple-lib": "",
     "moment":"2.8.3",
     "request-promise" : "0.2.4"
   },

@@ -24,6 +24,9 @@ cls.prototype.balance = function(){
 cls.prototype.tradeBuy = function(pair, price, amount){
     return this.private.trade(pair, 'bid', price, amount).then(function(result){
         return {
+            id : result.order_id,
+            remain : result.remains,
+            balance : result.funds,
         }
     })
 }
@@ -31,15 +34,29 @@ cls.prototype.tradeBuy = function(pair, price, amount){
 cls.prototype.tradeSell = function(pair, price, amount){
     return this.private.trade(pair, 'ask', price, amount).then(function(result){
         return {
+            id : result.order_id,
+            remain : result.remains,
+            balance : result.funds,
         }
     })
 }
+
+cls.prototype.tradeCancel = function(orderid){
+    return this.private.cancelOrder(orderid).then(function(result){
+        return {
+            id : result.order_id,
+            balance : result.funds,
+        }
+    })
+}
+
 
 cls.prototype.tradePosition = function(pair){
     return this.private.activeOrders().then(function(result){
         return getTradePosition(
             result,
-            Object.keys(result).filter(function(key){return result[key].currency_pair === pair})
+            Object.keys(result).
+                filter(function(key){return result[key].currency_pair === pair})
         );
     })
 }
@@ -71,13 +88,13 @@ var getTradeDirectionTo = function(type){
 var getTradePosition = function(result, keys){
     return keys.map(function(key){
         return {
-            type : getTradeDirectionFrom(result[v].action),
+            type : getTradeDirectionFrom(result[key].action),
             data : {
                 id : key,
-                pair : result[v].currency_pair,
-                price : result[v].price,
-                amount : result[v].amount,
-                time : result[v].timestamp,
+                pair : result[key].currency_pair,
+                price : result[key].price,
+                amount : result[key].amount,
+                time : parseInt(result[key].timestamp),
             },
         }
     }).

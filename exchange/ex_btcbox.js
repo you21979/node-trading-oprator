@@ -35,6 +35,8 @@ cls.prototype.balance = function(){
 cls.prototype.tradeBuy = function(pair, price, amount){
     return this.private.tradeAdd(pair, amount, price, 'buy').then(function(result){
         return {
+            id : result.id,
+            remain : 0,
         }
     })
 }
@@ -42,22 +44,45 @@ cls.prototype.tradeBuy = function(pair, price, amount){
 cls.prototype.tradeSell = function(pair, price, amount){
     return this.private.tradeAdd(pair, amount, price, 'sell').then(function(result){
         return {
+            id : result.id,
+            remain : 0,
+        }
+    })
+}
+
+cls.prototype.tradeCancel = function(pair, orderid){
+    return this.private.tradeCancel(pair, orderid).then(function(result){
+        return {
+            id : result.id,
+            remain : 0,
         }
     })
 }
 
 cls.prototype.tradePosition = function(pair){
-    return this.private.tradeList(pair, {since:0,type:'open'}).then(function(results){
+    var self = this;
+    return this.private.tradeList(pair, {since:0,type:'all'}).then(function(results){
+        var res = [];
+        results.map(function(v){
+            return function(){ return self.private.tradeView(pair, v.id) }
+        }).reduce(function(r, v){
+            return r.then(function(){
+                return v().then(function(q){res.push(q)})
+            })
+        }, Promise.resolve(0)).then(function(){console.log(res)})
+/*
         return getTradePosition(
             pair,
             results
         );
+*/
     })
 }
 cls.prototype.tradePositionAll = function(){
+    var self = this;
     return this.supportAssets().then(function(pairs){
         return Promise.all(pairs.map(function(pair){
-            return this.private.tradeList(pair, {since:0,type:'open'}).then(function(results){
+            return self.private.tradeList(pair, {since:0,type:'all'}).then(function(results){
                 return getTradePosition(
                     pair,
                     results
@@ -74,14 +99,14 @@ cls.prototype.tradePositionAll = function(){
 }
 
 var getTradePosition = function(pair, results){
-    return results.map(function(v){
+    return results.filter(function(v){return v.amount_outstanding > 0}).map(function(v){
         return {
             type : v.type,
             data : {
                 id : v.id,
                 pair : pair,
                 price : v.price,
-                amount : v.amount_original - v.amount_outstanding,
+                amount : v.amount_outstanding,
                 time : moment(v.datetime, 'YYYY-MM-DD HH:mm:ss').unix(),
             }
         }
