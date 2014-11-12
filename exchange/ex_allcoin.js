@@ -1,4 +1,5 @@
 var Promise = require('bluebird');
+var moment = require('moment');
 var allcoin = require('allcoin');
 exports.isPlugin = true;
 exports.name = function(){ return 'allcoin'; }
@@ -69,11 +70,11 @@ cls.prototype.tradeCancel = function(orderid){
 
 
 cls.prototype.tradePosition = function(pair){
-    return this.private.activeOrders().then(function(result){
+    return this.private.myOrders().then(function(result){
         return getTradePosition(
-            result,
-            Object.keys(result).
-                filter(function(key){return result[key].currency_pair === pair})
+            result.filter(function(v){
+                return [v.type, v.exchange].join('_').toLowerCase() === pair
+            })
         );
     })
 }
@@ -81,9 +82,26 @@ cls.prototype.tradePosition = function(pair){
 cls.prototype.tradePositionAll = function(){
     return this.private.activeOrders().then(function(result){
         return getTradePosition(
-            result,
-            Object.keys(result)
+            result
         );
     })
 }
 
+var getTradePosition = function(result){
+    return result.map(function(v){
+        return {
+            type : v.order_type,
+            data : {
+                id : v.order_id,
+                pair : [v.type, v.exchange].join('_').toLowerCase(),
+                price : parseFloat(v.price),
+                amount : parseFloat(v.rest_num),
+                time : moment(v.ctime, 'YYYY-MM-DD HH:mm:ss').unix(),
+            },
+        }
+    }).
+    reduce(function(r, v){
+        r[v.type].push(v.data)
+        return r;
+    },{buy:[],sell:[]});
+}
