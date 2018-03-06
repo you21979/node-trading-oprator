@@ -9,7 +9,7 @@
     "allcoin":"",
     "btcbox":"",
     "ripple-trade-helper" : "git://github.com/you21979/node-ripple-trade-helper.git",
-    "moment":"2.8.3",
+    "moment":"",
     "request-promise" : "0.2.4"
   },
   "readmeFilename": "README.md",
